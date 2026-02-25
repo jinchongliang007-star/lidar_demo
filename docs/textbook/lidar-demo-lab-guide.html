@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LiDAR 仿真实验指导书</title>
+    <style>
+        :root {
+            --bg-color: #ffffff;
+            --text-color: #333333;
+            --code-bg: #f5f5f5;
+            --border-color: #e0e0e0;
+            --link-color: #0066cc;
+        }
+
+        @media print {
+            body {
+                font-size: 11pt;
+            }
+            .no-print {
+                display: none !important;
+            }
+            @page {
+                margin: 2cm;
+                size: A4;
+            }
+            h1, h2, h3 {
+                page-break-after: avoid;
+            }
+            pre, table, img {
+                page-break-inside: avoid;
+            }
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+            line-height: 1.8;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+        }
+
+        h1 {
+            font-size: 2em;
+            border-bottom: 3px solid #2c3e50;
+            padding-bottom: 15px;
+            margin-top: 40px;
+            color: #2c3e50;
+        }
+
+        h2 {
+            font-size: 1.5em;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+            margin-top: 35px;
+            color: #34495e;
+        }
+
+        h3 {
+            font-size: 1.25em;
+            margin-top: 25px;
+            color: #2c3e50;
+        }
+
+        h4 {
+            font-size: 1.1em;
+            margin-top: 20px;
+            color: #34495e;
+        }
+
+        p {
+            margin: 15px 0;
+        }
+
+        code {
+            font-family: "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
+            background-color: var(--code-bg);
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 0.9em;
+        }
+
+        pre {
+            background-color: #2d2d2d;
+            color: #f8f8f2;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 20px 0;
+        }
+
+        pre code {
+            background-color: transparent;
+            padding: 0;
+            color: inherit;
+            font-size: 0.9em;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 0.95em;
+        }
+
+        th, td {
+            border: 1px solid var(--border-color);
+            padding: 12px 15px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f0f0f0;
+            font-weight: 600;
+        }
+
+        tr:nth-child(even) {
+            background-color: #fafafa;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+
+        blockquote {
+            border-left: 4px solid #3498db;
+            margin: 20px 0;
+            padding: 10px 20px;
+            background-color: #f9f9f9;
+        }
+
+        ul, ol {
+            padding-left: 25px;
+            margin: 15px 0;
+        }
+
+        li {
+            margin: 8px 0;
+        }
+
+        a {
+            color: var(--link-color);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        hr {
+            border: none;
+            border-top: 2px solid #eee;
+            margin: 40px 0;
+        }
+
+        .print-button {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            z-index: 1000;
+        }
+
+        .print-button:hover {
+            background-color: #2980b9;
+        }
+
+        .toc {
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 20px 25px;
+            margin: 30px 0;
+        }
+
+        .toc h3 {
+            margin-top: 0;
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+
+        .toc ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        .toc li {
+            margin: 8px 0;
+        }
+
+        .toc a {
+            color: #495057;
+        }
+
+        em {
+            color: #666;
+            font-size: 0.95em;
+        }
+    </style>
+</head>
+<body>
+    <button class="print-button no-print" onclick="window.print()">打印 / 导出 PDF</button>
+
+    <h1 id="lidar">LiDAR 点云仿真实验指导书</h1>
+<h2 id="_1">实验概述</h2>
+<p>本实验指导书配合《LiDAR 点云仿真演示系统》主教材使用，通过实践操作帮助学生深入理解 LiDAR 仿真技术。</p>
+<hr />
+<h2 id="_2">实验一：环境配置与基础运行</h2>
+<h3 id="_3">实验目的</h3>
+<ol>
+<li>掌握项目依赖的安装</li>
+<li>成功运行各个版本的仿真程序</li>
+<li>理解不同版本的特点和适用场景</li>
+</ol>
+<h3 id="_4">实验环境</h3>
+<table>
+<thead>
+<tr>
+<th>项目</th>
+<th>要求</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>操作系统</td>
+<td>Windows 10+ / macOS 10.14+ / Linux</td>
+</tr>
+<tr>
+<td>Python 版本</td>
+<td>3.8 或更高</td>
+</tr>
+<tr>
+<td>内存</td>
+<td>4GB 以上</td>
+</tr>
+<tr>
+<td>显卡</td>
+<td>支持 OpenGL 3.0+（Open3D 版本需要）</td>
+</tr>
+</tbody>
+</table>
+<h3 id="_5">实验步骤</h3>
+<h4 id="1">步骤 1：获取项目</h4>
+<pre><code class="language-bash"># 进入项目目录
+cd lidar_demo
+
+# 查看项目文件
+ls -la
+</code></pre>
+<h4 id="2">步骤 2：创建虚拟环境</h4>
+<pre><code class="language-bash"># 使用 Conda（推荐）
+conda env create -f environment.yml
+conda activate lidar_demo
+
+# 或使用 venv
+python -m venv venv
+source venv/bin/activate  # macOS/Linux
+# venv\Scripts\activate   # Windows
+</code></pre>
+<h4 id="3">步骤 3：安装依赖</h4>
+<pre><code class="language-bash"># 基础依赖（必需）
+pip install numpy matplotlib
+
+# 聚类功能（可选）
+pip install scikit-learn
+
+# Open3D 版本（可选）
+pip install open3d
+</code></pre>
+<h4 id="4">步骤 4：运行程序</h4>
+<pre><code class="language-bash"># 1. 基础版本 - 自动移动演示
+python lidar_simulation.py
+
+# 2. 交互版本 - 键盘控制
+python lidar_simulation_interactive.py
+
+# 3. Open3D 版本 - 高性能（需要安装 Open3D）
+python lidar_simulation_open3d.py
+
+# 4. 双窗口版本
+python lidar_simulation_dual.py
+</code></pre>
+<h3 id="_6">实验验证</h3>
+<p>完成以下检查项：</p>
+<ul>
+<li>[ ] 基础版本正常运行，显示双视图</li>
+<li>[ ] 交互版本可以响应键盘输入</li>
+<li>[ ] 观察到点云随 LiDAR 移动而变化</li>
+<li>[ ] 理解仿真视图和点云视图的区别</li>
+</ul>
+<h3 id="_7">程序截图</h3>
+<h4 id="_8">主界面</h4>
+<p><img alt="主界面" src="../images/main-interface.png" /></p>
+<p><em>图：系统主界面，左侧为仿真环境，右侧为点云数据</em></p>
+<h4 id="_9">不同视角展示</h4>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">俯视图</th>
+<th style="text-align: center;">正视图</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;"><img alt="俯视图" src="../images/top-view.png" /></td>
+<td style="text-align: center;"><img alt="正视图" src="../images/front-view.png" /></td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">侧视图</th>
+<th style="text-align: center;">等轴视图</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;"><img alt="侧视图" src="../images/side-view.png" /></td>
+<td style="text-align: center;"><img alt="等轴视图" src="../images/isometric-view.png" /></td>
+</tr>
+</tbody>
+</table>
+<h4 id="lidar_1">LiDAR 模型</h4>
+<p><img alt="LiDAR 模型" src="../images/lidar-model.png" /></p>
+<p><em>图：LiDAR 传感器模型及扫描射线</em></p>
+<h3 id="_10">常见问题</h3>
+<table>
+<thead>
+<tr>
+<th>问题</th>
+<th>解决方案</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>No module named 'numpy'</code></td>
+<td><code>pip install numpy</code></td>
+</tr>
+<tr>
+<td>Matplotlib 窗口无法显示</td>
+<td>检查 Python 是否有 GUI 权限</td>
+</tr>
+<tr>
+<td>Open3D 报错</td>
+<td>更新显卡驱动，确保支持 OpenGL</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="_11">实验二：参数调节实验</h2>
+<h3 id="_12">实验目的</h3>
+<ol>
+<li>理解 LiDAR 参数对点云质量的影响</li>
+<li>掌握参数调节方法</li>
+<li>分析参数与性能的权衡</li>
+</ol>
+<h3 id="_13">实验内容</h3>
+<h4 id="21">2.1 扫描分辨率实验</h4>
+<p><strong>实验文件</strong>：<code>lidar_simulation_interactive.py</code></p>
+<p><strong>修改位置</strong>：<code>Lidar3D</code> 类的 <code>__init__</code> 方法</p>
+<pre><code class="language-python">class Lidar3D:
+    def __init__(self, position):
+        ...
+        self.res_v = 32  # 垂直分辨率 - 修改此值
+        self.res_h = 80  # 水平分辨率 - 修改此值
+</code></pre>
+<p><strong>数据记录</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>垂直分辨率</th>
+<th>水平分辨率</th>
+<th>总射线数</th>
+<th>点云密度</th>
+<th>帧率</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>8</td>
+<td>40</td>
+<td>320</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>16</td>
+<td>80</td>
+<td>1280</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>32</td>
+<td>80</td>
+<td>2560</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>32</td>
+<td>160</td>
+<td>5120</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>64</td>
+<td>200</td>
+<td>12800</td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><strong>思考题</strong>：
+- 分辨率提高一倍，点云密度提高多少？
+- 分辨率对帧率有什么影响？为什么？</p>
+<h4 id="22">2.2 视场角实验</h4>
+<p><strong>修改位置</strong>：<code>Lidar3D</code> 类</p>
+<pre><code class="language-python">self.fov_v = (-15, 15)  # 垂直视场角（度）- 修改此值
+</code></pre>
+<p><strong>测试方案</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>垂直 FOV</th>
+<th>地面检测</th>
+<th>高处物体检测</th>
+<th>适用场景</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>(-5, 5)</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>(-15, 15)</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>(-30, 30)</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><strong>观察要点</strong>：
+- FOV 较小时能检测到什么？
+- FOV 较大时有什么优势和劣势？</p>
+<h4 id="23">2.3 探测范围实验</h4>
+<p><strong>修改位置</strong>：</p>
+<pre><code class="language-python">self.range = 50.0  # 最大探测距离 - 修改此值
+</code></pre>
+<p><strong>测试方案</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>探测范围</th>
+<th>能检测到的最远物体</th>
+<th>点云数量</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>10.0</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>25.0</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>50.0</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>100.0</td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="_14">实验三：噪声模型实验</h2>
+<h3 id="_15">实验目的</h3>
+<ol>
+<li>理解测量噪声的来源和影响</li>
+<li>掌握噪声参数的调节方法</li>
+<li>分析噪声对点云质量的影响</li>
+</ol>
+<h3 id="_16">实验内容</h3>
+<h4 id="31">3.1 方向噪声实验</h4>
+<p><strong>修改位置</strong>：<code>Lidar3D.scan()</code> 方法</p>
+<pre><code class="language-python"># 原代码
+noisy_d = d + np.random.normal(0, 0.005, 3)
+
+# 修改标准差参数进行实验
+noisy_d = d + np.random.normal(0, [新值], 3)
+</code></pre>
+<p><strong>测试方案</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>方向噪声（σ）</th>
+<th>点云边缘清晰度</th>
+<th>聚类效果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0.0（无噪声）</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>0.001</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>0.005（默认）</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>0.01</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>0.05</td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h4 id="32">3.2 距离噪声实验</h4>
+<p><strong>修改位置</strong>：<code>Lidar3D.scan()</code> 方法</p>
+<pre><code class="language-python"># 原代码
+noisy_t = t + np.random.normal(0, 0.05)
+
+# 修改标准差参数进行实验
+noisy_t = t + np.random.normal(0, [新值])
+</code></pre>
+<p><strong>测试方案</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>距离噪声（σ）</th>
+<th>物体轮廓</th>
+<th>地面平整度</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0.0（无噪声）</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>0.01</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>0.05（默认）</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>0.1</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>0.5</td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h4 id="33">3.3 噪声模型分析</h4>
+<p><strong>思考题</strong>：
+1. 方向噪声和距离噪声对点云的影响有什么不同？
+2. 为什么真实 LiDAR 会有噪声？噪声来源有哪些？
+3. 如何在点云处理中去除或减轻噪声的影响？</p>
+<hr />
+<h2 id="_17">实验四：环境修改实验</h2>
+<h3 id="_18">实验目的</h3>
+<ol>
+<li>理解环境模型的构建方式</li>
+<li>掌握添加和修改障碍物的方法</li>
+<li>分析不同环境对扫描结果的影响</li>
+</ol>
+<h3 id="_19">实验内容</h3>
+<h4 id="41">4.1 添加新障碍物</h4>
+<p><strong>修改位置</strong>：<code>Environment3D.__init__()</code> 方法</p>
+<pre><code class="language-python"># 在现有障碍物后添加新障碍物
+# Box(中心坐标, 尺寸, 颜色)
+
+# 添加一个蓝色长方体
+self.obstacles.append(Box([25, 10, 3], [4, 4, 6], 'blue'))
+
+# 添加一个黄色扁平体（模拟路障）
+self.obstacles.append(Box([30, -8, 0.5], [5, 1, 1], 'yellow'))
+</code></pre>
+<p><strong>任务</strong>：
+1. 添加至少 3 个不同形状和位置的障碍物
+2. 运行程序，观察点云变化
+3. 用键盘控制 LiDAR 从不同角度观察</p>
+<h4 id="42">4.2 修改障碍物参数</h4>
+<pre><code class="language-python"># 修改现有障碍物
+# 原代码
+self.obstacles.append(Box([10, 5, 2], [2, 2, 4], 'red'))
+
+# 修改为更大的障碍物
+self.obstacles.append(Box([10, 5, 3], [4, 4, 6], 'red'))
+</code></pre>
+<p><strong>任务</strong>：
+1. 将红色障碍物的尺寸加倍
+2. 将墙壁向 LiDAR 方向移动 10 单位
+3. 观察修改后的点云变化</p>
+<h4 id="43">4.3 创建特定场景</h4>
+<p><strong>任务</strong>：创建一个"走廊"场景</p>
+<pre><code class="language-python"># 创建两侧墙壁形成走廊
+self.obstacles.append(Box([20, -8, 5], [40, 1, 10], 'gray'))  # 左墙
+self.obstacles.append(Box([20, 8, 5], [40, 1, 10], 'gray'))   # 右墙
+</code></pre>
+<p><strong>观察要点</strong>：
+- 走廊内的点云分布特点
+- LiDAR 在走廊中移动时的盲区
+- 如何通过点云识别走廊结构</p>
+<hr />
+<h2 id="_20">实验五：聚类算法实验</h2>
+<h3 id="_21">实验目的</h3>
+<ol>
+<li>理解 DBSCAN 聚类算法原理</li>
+<li>掌握聚类参数的调节方法</li>
+<li>分析聚类在点云处理中的应用</li>
+</ol>
+<h3 id="_22">实验内容</h3>
+<h4 id="51-dbscan">5.1 理解 DBSCAN 参数</h4>
+<pre><code class="language-python">def cluster_points(points):
+    clustering = DBSCAN(
+        eps=2.0,        # 邻域半径 - 修改此值
+        min_samples=3   # 最小样本数 - 修改此值
+    ).fit(points)
+    return clustering.labels_
+</code></pre>
+<p><strong>参数说明</strong>：
+- <code>eps</code>：两个点距离小于此值时视为邻居
+- <code>min_samples</code>：形成聚类所需的最小点数
+- 标签 <code>-1</code> 表示噪声点（不属于任何聚类）</p>
+<h4 id="52">5.2 参数调节实验</h4>
+<p><strong>eps 实验</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>eps 值</th>
+<th>聚类数量</th>
+<th>噪声点数量</th>
+<th>聚类效果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0.5</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>1.0</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>2.0（默认）</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>5.0</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>10.0</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><strong>min_samples 实验</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>min_samples</th>
+<th>聚类数量</th>
+<th>噪声点数量</th>
+<th>聚类效果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>3（默认）</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>5</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>10</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h4 id="53">5.3 聚类应用分析</h4>
+<p><strong>思考题</strong>：
+1. eps 太大会导致什么问题？
+2. eps 太小会导致什么问题？
+3. 如何根据场景特点选择合适的聚类参数？</p>
+<hr />
+<h2 id="_23">实验六：性能对比实验</h2>
+<h3 id="_24">实验目的</h3>
+<ol>
+<li>对比不同版本的性能差异</li>
+<li>理解性能优化的原理</li>
+<li>掌握性能分析方法</li>
+</ol>
+<h3 id="_25">实验内容</h3>
+<h4 id="61">6.1 帧率测试</h4>
+<p><strong>测试方法</strong>：在每个版本的更新函数中添加计时代码</p>
+<pre><code class="language-python">import time
+
+def update(frame, ...):
+    start_time = time.time()
+
+    # ... 原有代码 ...
+
+    frame_time = time.time() - start_time
+    fps = 1.0 / frame_time if frame_time &gt; 0 else 0
+    print(f&quot;FPS: {fps:.1f}&quot;)
+</code></pre>
+<p><strong>数据记录</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>版本</th>
+<th>分辨率</th>
+<th>平均 FPS</th>
+<th>CPU 占用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>基础版</td>
+<td>32×80</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>交互版</td>
+<td>32×80</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Open3D版</td>
+<td>64×200</td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h4 id="62">6.2 瓶颈分析</h4>
+<p><strong>使用 cProfile 分析</strong>：</p>
+<pre><code class="language-bash">python -m cProfile -s cumtime lidar_simulation.py
+</code></pre>
+<p><strong>关注指标</strong>：
+- <code>cumtime</code>：累计时间
+- <code>ncalls</code>：调用次数
+- 找出耗时最多的函数</p>
+<hr />
+<h2 id="_26">实验报告要求</h2>
+<h3 id="_27">报告结构</h3>
+<ol>
+<li><strong>实验概述</strong>（10%）</li>
+<li>实验目的</li>
+<li>
+<p>实验环境</p>
+</li>
+<li>
+<p><strong>实验过程</strong>（40%）</p>
+</li>
+<li>每个实验的详细步骤</li>
+<li>关键截图</li>
+<li>
+<p>数据记录表格</p>
+</li>
+<li>
+<p><strong>实验结果分析</strong>（30%）</p>
+</li>
+<li>参数对点云质量的影响分析</li>
+<li>性能对比分析</li>
+<li>
+<p>遇到的问题及解决方案</p>
+</li>
+<li>
+<p><strong>思考与总结</strong>（20%）</p>
+</li>
+<li>实验思考题回答</li>
+<li>学习心得</li>
+<li>改进建议</li>
+</ol>
+<h3 id="_28">评分标准</h3>
+<table>
+<thead>
+<tr>
+<th>项目</th>
+<th>优秀 (90-100)</th>
+<th>良好 (80-89)</th>
+<th>中等 (70-79)</th>
+<th>及格 (60-69)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>实验完成度</td>
+<td>全部完成，有创新</td>
+<td>全部完成</td>
+<td>大部分完成</td>
+<td>基本完成</td>
+</tr>
+<tr>
+<td>数据记录</td>
+<td>完整准确，有图表</td>
+<td>基本完整</td>
+<td>部分完整</td>
+<td>有记录</td>
+</tr>
+<tr>
+<td>分析深度</td>
+<td>深入透彻</td>
+<td>较为深入</td>
+<td>基本分析</td>
+<td>简单描述</td>
+</tr>
+<tr>
+<td>报告规范</td>
+<td>格式规范，图文并茂</td>
+<td>格式良好</td>
+<td>格式基本正确</td>
+<td>格式欠佳</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="_29">附录：快捷键速查</h2>
+<table>
+<thead>
+<tr>
+<th>按键</th>
+<th>功能</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>W</td>
+<td>前进（X+）</td>
+</tr>
+<tr>
+<td>S</td>
+<td>后退（X-）</td>
+</tr>
+<tr>
+<td>A</td>
+<td>左移（Y+）</td>
+</tr>
+<tr>
+<td>D</td>
+<td>右移（Y-）</td>
+</tr>
+<tr>
+<td>Q</td>
+<td>上升（Z+）</td>
+</tr>
+<tr>
+<td>E</td>
+<td>下降（Z-）</td>
+</tr>
+<tr>
+<td>鼠标拖拽</td>
+<td>旋转视角（3D图）</td>
+</tr>
+<tr>
+<td>滚轮</td>
+<td>缩放（部分版本）</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<p><em>本实验指导书配套项目：LiDAR 点云仿真演示系统</em></p>
+<p><em>最后更新：2026年2月</em></p>
+</body>
+</html>

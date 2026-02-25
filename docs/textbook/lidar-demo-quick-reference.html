@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LiDAR 仿真快速参考手册</title>
+    <style>
+        :root {
+            --bg-color: #ffffff;
+            --text-color: #333333;
+            --code-bg: #f5f5f5;
+            --border-color: #e0e0e0;
+            --link-color: #0066cc;
+        }
+
+        @media print {
+            body {
+                font-size: 11pt;
+            }
+            .no-print {
+                display: none !important;
+            }
+            @page {
+                margin: 2cm;
+                size: A4;
+            }
+            h1, h2, h3 {
+                page-break-after: avoid;
+            }
+            pre, table, img {
+                page-break-inside: avoid;
+            }
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+            line-height: 1.8;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+        }
+
+        h1 {
+            font-size: 2em;
+            border-bottom: 3px solid #2c3e50;
+            padding-bottom: 15px;
+            margin-top: 40px;
+            color: #2c3e50;
+        }
+
+        h2 {
+            font-size: 1.5em;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+            margin-top: 35px;
+            color: #34495e;
+        }
+
+        h3 {
+            font-size: 1.25em;
+            margin-top: 25px;
+            color: #2c3e50;
+        }
+
+        h4 {
+            font-size: 1.1em;
+            margin-top: 20px;
+            color: #34495e;
+        }
+
+        p {
+            margin: 15px 0;
+        }
+
+        code {
+            font-family: "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
+            background-color: var(--code-bg);
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 0.9em;
+        }
+
+        pre {
+            background-color: #2d2d2d;
+            color: #f8f8f2;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 20px 0;
+        }
+
+        pre code {
+            background-color: transparent;
+            padding: 0;
+            color: inherit;
+            font-size: 0.9em;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 0.95em;
+        }
+
+        th, td {
+            border: 1px solid var(--border-color);
+            padding: 12px 15px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f0f0f0;
+            font-weight: 600;
+        }
+
+        tr:nth-child(even) {
+            background-color: #fafafa;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+
+        blockquote {
+            border-left: 4px solid #3498db;
+            margin: 20px 0;
+            padding: 10px 20px;
+            background-color: #f9f9f9;
+        }
+
+        ul, ol {
+            padding-left: 25px;
+            margin: 15px 0;
+        }
+
+        li {
+            margin: 8px 0;
+        }
+
+        a {
+            color: var(--link-color);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        hr {
+            border: none;
+            border-top: 2px solid #eee;
+            margin: 40px 0;
+        }
+
+        .print-button {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            z-index: 1000;
+        }
+
+        .print-button:hover {
+            background-color: #2980b9;
+        }
+
+        .toc {
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 20px 25px;
+            margin: 30px 0;
+        }
+
+        .toc h3 {
+            margin-top: 0;
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+
+        .toc ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        .toc li {
+            margin: 8px 0;
+        }
+
+        .toc a {
+            color: #495057;
+        }
+
+        em {
+            color: #666;
+            font-size: 0.95em;
+        }
+    </style>
+</head>
+<body>
+    <button class="print-button no-print" onclick="window.print()">打印 / 导出 PDF</button>
+
+    <h1 id="lidar">LiDAR 仿真快速参考手册</h1>
+<h2 id="_1">核心概念速查</h2>
+<h3 id="_2">射线投射原理</h3>
+<pre><code>射线定义: P(t) = origin + t * direction
+- origin: 射线起点（LiDAR 位置）
+- direction: 射线方向（单位向量）
+- t: 参数，t &gt; 0 表示射线正方向
+</code></pre>
+<h3 id="_3">坐标转换</h3>
+<p><strong>球坐标 → 直角坐标</strong>：</p>
+<pre><code class="language-python"># 已知：距离 d，水平角 h，垂直角 v（弧度）
+x = d * cos(v) * cos(h)
+y = d * cos(v) * sin(h)
+z = d * sin(v)
+</code></pre>
+<hr />
+<h2 id="_4">关键参数</h2>
+<h3 id="lidar_1">LiDAR 参数</h3>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>变量名</th>
+<th>默认值</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>最大探测距离</td>
+<td><code>range</code></td>
+<td>50.0</td>
+<td>米</td>
+</tr>
+<tr>
+<td>垂直视场角</td>
+<td><code>fov_v</code></td>
+<td>(-15, 15)</td>
+<td>度</td>
+</tr>
+<tr>
+<td>水平视场角</td>
+<td><code>fov_h</code></td>
+<td>(0, 360)</td>
+<td>度</td>
+</tr>
+<tr>
+<td>垂直分辨率</td>
+<td><code>res_v</code></td>
+<td>32</td>
+<td>线数</td>
+</tr>
+<tr>
+<td>水平分辨率</td>
+<td><code>res_h</code></td>
+<td>80</td>
+<td>点数/圈</td>
+</tr>
+</tbody>
+</table>
+<h3 id="_5">计算公式</h3>
+<pre><code class="language-python"># 总射线数
+total_rays = res_v * res_h
+
+# 垂直角度间隔
+v_step = (fov_v[1] - fov_v[0]) / (res_v - 1)
+
+# 水平角度间隔
+h_step = (fov_h[1] - fov_h[0]) / res_h
+</code></pre>
+<h3 id="_6">噪声参数</h3>
+<table>
+<thead>
+<tr>
+<th>类型</th>
+<th>默认值</th>
+<th>代码位置</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>方向噪声</td>
+<td>σ = 0.005</td>
+<td><code>noisy_d = d + np.random.normal(0, 0.005, 3)</code></td>
+</tr>
+<tr>
+<td>距离噪声</td>
+<td>σ = 0.05</td>
+<td><code>noisy_t = t + np.random.normal(0, 0.05)</code></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="aabb-slab">AABB 碰撞检测（Slab 方法）</h2>
+<h3 id="_7">算法原理</h3>
+<pre><code>1. 对于每个轴（X, Y, Z）：
+   - 计算 t1（进入 Slab 的时间）
+   - 计算 t2（离开 Slab 的时间）
+
+2. t_enter = max(t1_x, t1_y, t1_z)
+   t_exit = min(t2_x, t2_y, t2_z)
+
+3. 如果 t_enter &lt;= t_exit，则相交
+</code></pre>
+<h3 id="_8">代码实现</h3>
+<pre><code class="language-python">def intersect(ray_origin, ray_dir, min_bound, max_bound):
+    inv_dir = 1.0 / (ray_dir + 1e-9)  # 避免除零
+
+    t1 = (min_bound - ray_origin) * inv_dir
+    t2 = (max_bound - ray_origin) * inv_dir
+
+    tmin = np.maximum(np.minimum(t1, t2), 0.0)
+    tmax = np.minimum(np.maximum(t1, t2), 1e9)
+
+    t_enter = np.max(tmin)
+    t_exit = np.min(tmax)
+
+    return t_enter if t_exit &gt;= t_enter else np.inf
+</code></pre>
+<hr />
+<h2 id="dbscan">DBSCAN 聚类</h2>
+<h3 id="_9">参数说明</h3>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>默认值</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>eps</code></td>
+<td>2.0</td>
+<td>邻域半径</td>
+</tr>
+<tr>
+<td><code>min_samples</code></td>
+<td>3</td>
+<td>最小样本数</td>
+</tr>
+</tbody>
+</table>
+<h3 id="_10">代码实现</h3>
+<pre><code class="language-python">from sklearn.cluster import DBSCAN
+
+def cluster_points(points, eps=2.0, min_samples=3):
+    if len(points) == 0:
+        return np.zeros(0)
+    clustering = DBSCAN(eps=eps, min_samples=min_samples).fit(points)
+    return clustering.labels_
+</code></pre>
+<h3 id="_11">标签含义</h3>
+<ul>
+<li><code>label &gt;= 0</code>: 属于该编号的聚类</li>
+<li><code>label == -1</code>: 噪声点（不属于任何聚类）</li>
+</ul>
+<hr />
+<h2 id="_12">版本对比</h2>
+<table>
+<thead>
+<tr>
+<th>特性</th>
+<th>基础版</th>
+<th>交互版</th>
+<th>Open3D版</th>
+<th>双窗口版</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>文件</td>
+<td><code>lidar_simulation.py</code></td>
+<td><code>lidar_simulation_interactive.py</code></td>
+<td><code>lidar_simulation_open3d.py</code></td>
+<td><code>lidar_simulation_dual.py</code></td>
+</tr>
+<tr>
+<td>渲染引擎</td>
+<td>Matplotlib</td>
+<td>Matplotlib</td>
+<td>Open3D GUI</td>
+<td>Open3D</td>
+</tr>
+<tr>
+<td>交互方式</td>
+<td>自动移动</td>
+<td>键盘控制</td>
+<td>键盘控制</td>
+<td>键盘控制</td>
+</tr>
+<tr>
+<td>默认分辨率</td>
+<td>15×60</td>
+<td>32×80</td>
+<td>64×200</td>
+<td>64×200</td>
+</tr>
+<tr>
+<td>帧率</td>
+<td>~10 FPS</td>
+<td>~20 FPS</td>
+<td>~100 FPS</td>
+<td>~60 FPS</td>
+</tr>
+<tr>
+<td>GPU 加速</td>
+<td>否</td>
+<td>否</td>
+<td>是</td>
+<td>是</td>
+</tr>
+<tr>
+<td>依赖</td>
+<td>numpy, matplotlib</td>
+<td>numpy, matplotlib</td>
+<td>numpy, open3d</td>
+<td>numpy, open3d</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="_13">常用代码片段</h2>
+<h3 id="lidar_2">创建 LiDAR</h3>
+<pre><code class="language-python">lidar = Lidar3D([0, 0, 2])  # 初始位置 (x, y, z)
+</code></pre>
+<h3 id="_14">创建环境</h3>
+<pre><code class="language-python">env = Environment3D()
+# 添加自定义障碍物
+env.obstacles.append(Box([x, y, z], [w, h, d], 'color'))
+</code></pre>
+<h3 id="_15">执行扫描</h3>
+<pre><code class="language-python">points = lidar.scan(env)
+print(f&quot;获取 {len(points)} 个点&quot;)
+</code></pre>
+<h3 id="lidar_3">移动 LiDAR</h3>
+<pre><code class="language-python">new_pos = lidar.position + np.array([dx, dy, dz])
+if env.is_safe(new_pos):
+    lidar.position = new_pos
+</code></pre>
+<h3 id="_16">点云着色</h3>
+<pre><code class="language-python"># 按高度着色
+colors = np.zeros_like(points)
+norm_z = np.clip(points[:, 2] / 5.0, 0, 1)
+colors[:, 0] = norm_z        # R
+colors[:, 1] = 1.0 - norm_z  # G
+colors[:, 2] = 0.5           # B
+</code></pre>
+<hr />
+<h2 id="_17">快捷键</h2>
+<table>
+<thead>
+<tr>
+<th>按键</th>
+<th>功能</th>
+<th>方向</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>W</td>
+<td>前进</td>
+<td>X+</td>
+</tr>
+<tr>
+<td>S</td>
+<td>后退</td>
+<td>X-</td>
+</tr>
+<tr>
+<td>A</td>
+<td>左移</td>
+<td>Y+</td>
+</tr>
+<tr>
+<td>D</td>
+<td>右移</td>
+<td>Y-</td>
+</tr>
+<tr>
+<td>Q</td>
+<td>上升</td>
+<td>Z+</td>
+</tr>
+<tr>
+<td>E</td>
+<td>下降</td>
+<td>Z-</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="_18">故障排除</h2>
+<h3 id="_19">常见错误</h3>
+<table>
+<thead>
+<tr>
+<th>错误</th>
+<th>原因</th>
+<th>解决方案</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ModuleNotFoundError: No module named 'numpy'</code></td>
+<td>依赖未安装</td>
+<td><code>pip install numpy</code></td>
+</tr>
+<tr>
+<td><code>ModuleNotFoundError: No module named 'sklearn'</code></td>
+<td>sklearn 未安装</td>
+<td><code>pip install scikit-learn</code></td>
+</tr>
+<tr>
+<td><code>ModuleNotFoundError: No module named 'open3d'</code></td>
+<td>Open3D 未安装</td>
+<td><code>pip install open3d</code></td>
+</tr>
+<tr>
+<td>Matplotlib 窗口空白</td>
+<td>后端问题</td>
+<td>尝试 <code>matplotlib.use('TkAgg')</code></td>
+</tr>
+<tr>
+<td>Open3D 报错</td>
+<td>OpenGL 不支持</td>
+<td>更新显卡驱动</td>
+</tr>
+<tr>
+<td>程序卡顿</td>
+<td>分辨率过高</td>
+<td>降低 res_v 和 res_h</td>
+</tr>
+</tbody>
+</table>
+<h3 id="_20">调试代码</h3>
+<pre><code class="language-python"># 检查射线方向
+print(f&quot;射线数量: {len(lidar.ray_dirs)}&quot;)
+print(f&quot;第一条射线方向: {lidar.ray_dirs[0]}&quot;)
+
+# 检查碰撞检测
+t = env.check_collision(lidar.position, lidar.ray_dirs[0])
+print(f&quot;碰撞距离: {t}&quot;)
+
+# 检查点云统计
+points = lidar.scan(env)
+if len(points) &gt; 0:
+    print(f&quot;点云范围: X[{points[:,0].min():.1f}, {points[:,0].max():.1f}]&quot;)
+    print(f&quot;          Y[{points[:,1].min():.1f}, {points[:,1].max():.1f}]&quot;)
+    print(f&quot;          Z[{points[:,2].min():.1f}, {points[:,2].max():.1f}]&quot;)
+</code></pre>
+<hr />
+<h2 id="_21">性能优化</h2>
+<h3 id="_22">减少射线数量</h3>
+<pre><code class="language-python"># 降低分辨率
+self.res_v = 16  # 原 32
+self.res_h = 40  # 原 80
+</code></pre>
+<h3 id="gpu">使用 GPU 加速</h3>
+<pre><code class="language-python"># Open3D 版本自动使用 GPU
+# 确保安装了支持 CUDA 的 Open3D
+pip install open3d-cuda
+</code></pre>
+<h3 id="_23">批量处理</h3>
+<pre><code class="language-python"># 避免循环，使用向量化操作
+# 原代码
+for d in ray_dirs:
+    t = check_collision(origin, d)
+
+# 优化后
+t_all = check_collision_batch(origin, ray_dirs)
+</code></pre>
+<hr />
+<h2 id="_24">文件结构</h2>
+<pre><code>lidar_demo/
+├── lidar_simulation.py              # 基础版
+├── lidar_simulation_interactive.py  # 交互版
+├── lidar_simulation_open3d.py       # Open3D版
+├── lidar_simulation_dual.py         # 双窗口版
+├── lidar_simulation_stable.py       # 稳定版
+├── environment.yml                  # Conda 环境
+└── docs/
+    ├── textbook/                    # 文档
+    └── images/                      # 图片
+</code></pre>
+<hr />
+<h2 id="_25">常用命令</h2>
+<pre><code class="language-bash"># 安装依赖
+pip install numpy matplotlib scikit-learn open3d
+
+# 运行各版本
+python lidar_simulation.py              # 基础版
+python lidar_simulation_interactive.py  # 交互版
+python lidar_simulation_open3d.py       # Open3D版
+
+# 性能分析
+python -m cProfile lidar_simulation.py
+
+# 查看帮助
+python lidar_simulation.py --help
+</code></pre>
+<hr />
+<p><em>本快速参考手册配套项目：LiDAR 点云仿真演示系统</em></p>
+<p><em>最后更新：2026年2月</em></p>
+</body>
+</html>

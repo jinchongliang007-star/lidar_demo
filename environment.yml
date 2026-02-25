@@ -1,0 +1,12 @@
+name: lidar_demo
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.9
+  - numpy
+  - matplotlib
+  - scikit-learn
+  - pip
+  - pip:
+    - open3d

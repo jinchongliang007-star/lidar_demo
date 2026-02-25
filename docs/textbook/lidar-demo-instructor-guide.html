@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LiDAR 仿真教学教师手册</title>
+    <style>
+        :root {
+            --bg-color: #ffffff;
+            --text-color: #333333;
+            --code-bg: #f5f5f5;
+            --border-color: #e0e0e0;
+            --link-color: #0066cc;
+        }
+
+        @media print {
+            body {
+                font-size: 11pt;
+            }
+            .no-print {
+                display: none !important;
+            }
+            @page {
+                margin: 2cm;
+                size: A4;
+            }
+            h1, h2, h3 {
+                page-break-after: avoid;
+            }
+            pre, table, img {
+                page-break-inside: avoid;
+            }
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+            line-height: 1.8;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+        }
+
+        h1 {
+            font-size: 2em;
+            border-bottom: 3px solid #2c3e50;
+            padding-bottom: 15px;
+            margin-top: 40px;
+            color: #2c3e50;
+        }
+
+        h2 {
+            font-size: 1.5em;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+            margin-top: 35px;
+            color: #34495e;
+        }
+
+        h3 {
+            font-size: 1.25em;
+            margin-top: 25px;
+            color: #2c3e50;
+        }
+
+        h4 {
+            font-size: 1.1em;
+            margin-top: 20px;
+            color: #34495e;
+        }
+
+        p {
+            margin: 15px 0;
+        }
+
+        code {
+            font-family: "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
+            background-color: var(--code-bg);
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 0.9em;
+        }
+
+        pre {
+            background-color: #2d2d2d;
+            color: #f8f8f2;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 20px 0;
+        }
+
+        pre code {
+            background-color: transparent;
+            padding: 0;
+            color: inherit;
+            font-size: 0.9em;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 0.95em;
+        }
+
+        th, td {
+            border: 1px solid var(--border-color);
+            padding: 12px 15px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f0f0f0;
+            font-weight: 600;
+        }
+
+        tr:nth-child(even) {
+            background-color: #fafafa;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+
+        blockquote {
+            border-left: 4px solid #3498db;
+            margin: 20px 0;
+            padding: 10px 20px;
+            background-color: #f9f9f9;
+        }
+
+        ul, ol {
+            padding-left: 25px;
+            margin: 15px 0;
+        }
+
+        li {
+            margin: 8px 0;
+        }
+
+        a {
+            color: var(--link-color);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        hr {
+            border: none;
+            border-top: 2px solid #eee;
+            margin: 40px 0;
+        }
+
+        .print-button {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            z-index: 1000;
+        }
+
+        .print-button:hover {
+            background-color: #2980b9;
+        }
+
+        .toc {
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 20px 25px;
+            margin: 30px 0;
+        }
+
+        .toc h3 {
+            margin-top: 0;
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+
+        .toc ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        .toc li {
+            margin: 8px 0;
+        }
+
+        .toc a {
+            color: #495057;
+        }
+
+        em {
+            color: #666;
+            font-size: 0.95em;
+        }
+    </style>
+</head>
+<body>
+    <button class="print-button no-print" onclick="window.print()">打印 / 导出 PDF</button>
+
+    <h1 id="lidar">LiDAR 仿真教学教师手册</h1>
+<h2 id="_1">课程概述</h2>
+<h3 id="_2">课程定位</h3>
+<p>本课程为计算机视觉、机器人感知和自动驾驶方向学生设计的 LiDAR 仿真入门课程，通过多种技术实现帮助学生理解 LiDAR 点云生成原理。</p>
+<h3 id="_3">课程目标</h3>
+<p>完成本课程后，学生应能够：</p>
+<ol>
+<li><strong>知识层面</strong></li>
+<li>理解射线投射（Ray Casting）算法原理</li>
+<li>掌握 AABB 碰撞检测（Slab 方法）</li>
+<li>
+<p>了解点云聚类（DBSCAN）基础</p>
+</li>
+<li>
+<p><strong>技能层面</strong></p>
+</li>
+<li>能够运行和操作多种仿真程序</li>
+<li>能够调整参数并分析对点云的影响</li>
+<li>
+<p>能够阅读和修改 Python 仿真代码</p>
+</li>
+<li>
+<p><strong>应用层面</strong></p>
+</li>
+<li>理解 LiDAR 仿真在自动驾驶开发中的应用</li>
+<li>了解不同可视化技术的优缺点</li>
+</ol>
+<h3 id="_4">课时安排建议</h3>
+<table>
+<thead>
+<tr>
+<th>章节</th>
+<th>内容</th>
+<th>建议课时</th>
+<th>教学方式</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>第一章</td>
+<td>教学概述</td>
+<td>0.5 课时</td>
+<td>讲授</td>
+</tr>
+<tr>
+<td>第二章</td>
+<td>LiDAR 仿真原理</td>
+<td>2 课时</td>
+<td>讲授+演示</td>
+</tr>
+<tr>
+<td>第三章</td>
+<td>系统架构与设计</td>
+<td>1.5 课时</td>
+<td>讲授</td>
+</tr>
+<tr>
+<td>第四章</td>
+<td>核心代码解析</td>
+<td>2 课时</td>
+<td>讲授+实操</td>
+</tr>
+<tr>
+<td>第五章</td>
+<td>版本详解</td>
+<td>1 课时</td>
+<td>演示</td>
+</tr>
+<tr>
+<td>第六章</td>
+<td>实验指导</td>
+<td>4 课时</td>
+<td>实验课</td>
+</tr>
+<tr>
+<td>第七章</td>
+<td>技术概念索引</td>
+<td>0.5 课时</td>
+<td>总结</td>
+</tr>
+<tr>
+<td><strong>合计</strong></td>
+<td></td>
+<td><strong>11.5 课时</strong></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="_5">各章节教学要点</h2>
+<h3 id="_6">第一章：教学概述</h3>
+<p><strong>教学目标</strong>：让学生明确学习目标和项目结构</p>
+<p><strong>重点内容</strong>：
+1. 项目提供的多种实现版本
+2. 各版本的特点和适用场景
+3. 先修知识要求</p>
+<p><strong>教学建议</strong>：
+- 快速演示各版本的运行效果
+- 让学生选择适合自己的版本进行深入学习
+- 明确基础版和 Open3D 版本的区别</p>
+<hr />
+<h3 id="lidar_1">第二章：LiDAR 仿真原理</h3>
+<p><strong>教学目标</strong>：建立射线投射和碰撞检测的基础认知</p>
+<p><strong>重点内容</strong>：
+1. 射线投射算法原理
+2. AABB 碰撞检测（Slab 方法）
+3. 点云生成流程
+4. 噪声模型</p>
+<p><strong>教学难点</strong>：
+1. <strong>Slab 方法</strong>：学生可能难以理解三维相交的分解思路
+2. <strong>噪声模型</strong>：为什么需要添加噪声？</p>
+<p><strong>教学建议</strong>：</p>
+<p>对于 Slab 方法：
+- 从 1D 区间相交开始讲解
+- 逐步扩展到 2D、3D
+- 配合动画演示</p>
+<p>对于噪声模型：
+- 解释真实 LiDAR 的噪声来源
+- 演示无噪声和有噪声的点云差异
+- 讨论噪声对后续处理的影响</p>
+<p><strong>关键公式</strong>：</p>
+<pre><code class="language-python"># 射线定义
+P(t) = origin + t * direction
+
+# Slab 相交条件
+t_enter &lt;= t_exit → 相交
+</code></pre>
+<p><strong>常见问题</strong>：
+- Q: 为什么要用 Slab 方法而不是遍历三角形？
+- A: Slab 方法复杂度 O(1)，而遍历三角形与面数相关</p>
+<hr />
+<h3 id="_7">第三章：系统架构与设计</h3>
+<p><strong>教学目标</strong>：理解项目的设计思路和技术选型</p>
+<p><strong>重点内容</strong>：
+1. 四种技术方案的对比
+2. 核心类设计
+3. 数据流设计</p>
+<p><strong>教学建议</strong>：
+- 用表格对比各版本的优缺点
+- 画出类图帮助理解
+- 讨论为什么需要多种实现</p>
+<p><strong>技术选型讨论</strong>：
+| 场景 | 推荐版本 | 原因 |
+|------|---------|------|
+| 教学演示 | 基础版 | 代码简单，容易理解 |
+| 交互学习 | 交互版 | 可以主动探索 |
+| 高性能仿真 | Open3D版 | GPU 加速，高分辨率 |
+| 多视图展示 | 双窗口版 | 独立窗口，灵活布局 |</p>
+<hr />
+<h3 id="_8">第四章：核心代码解析</h3>
+<p><strong>教学目标</strong>：深入理解关键代码实现</p>
+<p><strong>重点内容</strong>：
+1. LiDAR 扫描实现
+2. 环境碰撞检测
+3. 点云聚类
+4. 交互控制</p>
+<p><strong>教学建议</strong>：
+- 逐行讲解核心代码
+- 让学生预测代码运行结果
+- 鼓励学生修改代码并观察变化</p>
+<p><strong>代码讲解顺序</strong>：</p>
+<pre><code class="language-python"># 1. Box 类（障碍物定义）
+class Box:
+    def __init__(self, center, size, color)
+    def contains(self, point, margin)
+    def intersect(self, ray_origin, ray_dir)
+
+# 2. Environment3D 类（环境管理）
+class Environment3D:
+    def __init__(self)
+    def check_collision(self, ray_origin, ray_dir)
+    def is_safe(self, position, margin)
+
+# 3. Lidar3D 类（传感器模型）
+class Lidar3D:
+    def __init__(self, position)
+    def _generate_ray_dirs(self)
+    def scan(self, env)
+
+# 4. 辅助函数
+def cluster_points(points)
+</code></pre>
+<p><strong>练习题</strong>：
+1. 修改 Box.intersect() 使其返回交点坐标而非距离
+2. 添加一个新的圆柱形障碍物类</p>
+<hr />
+<h3 id="_9">第五章：版本详解</h3>
+<p><strong>教学目标</strong>：了解各版本的实现细节</p>
+<p><strong>教学建议</strong>：
+- 对比演示各版本的运行效果
+- 讲解每个版本的关键代码
+- 讨论性能差异的原因</p>
+<p><strong>关键差异</strong>：
+| 版本 | 关键技术 | 性能因素 |
+|------|---------|---------|
+| 基础版 | Matplotlib 动画 | Python 循环慢 |
+| 交互版 | 键盘事件 | 同上 |
+| Open3D版 | GPU 光线追踪 | GPU 并行加速 |
+| 双窗口版 | 多窗口管理 | 独立渲染上下文 |</p>
+<hr />
+<h3 id="_10">第六章：实验指导</h3>
+<p><strong>教学目标</strong>：通过实践加深理解</p>
+<p><strong>实验安排</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>实验编号</th>
+<th>实验内容</th>
+<th>时长</th>
+<th>难度</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>实验一</td>
+<td>环境配置与基础运行</td>
+<td>0.5 课时</td>
+<td>简单</td>
+</tr>
+<tr>
+<td>实验二</td>
+<td>参数调节实验</td>
+<td>1 课时</td>
+<td>中等</td>
+</tr>
+<tr>
+<td>实验三</td>
+<td>噪声模型实验</td>
+<td>0.5 课时</td>
+<td>中等</td>
+</tr>
+<tr>
+<td>实验四</td>
+<td>环境修改实验</td>
+<td>1 课时</td>
+<td>中等</td>
+</tr>
+<tr>
+<td>实验五</td>
+<td>聚类算法实验</td>
+<td>0.5 课时</td>
+<td>较难</td>
+</tr>
+<tr>
+<td>实验六</td>
+<td>性能对比实验</td>
+<td>0.5 课时</td>
+<td>较难</td>
+</tr>
+</tbody>
+</table>
+<p><strong>实验课管理建议</strong>：
+1. <strong>准备工作</strong>
+   - 提前检查环境配置
+   - 准备常见问题的解决方案
+   - 打印实验指导书</p>
+<ol>
+<li><strong>实验过程</strong></li>
+<li>先演示一遍完整流程</li>
+<li>学生独立操作，教师巡视指导</li>
+<li>
+<p>鼓励学生记录数据</p>
+</li>
+<li>
+<p><strong>实验报告</strong></p>
+</li>
+<li>明确报告格式要求</li>
+<li>强调数据分析的重要性</li>
+<li>建立评分标准</li>
+</ol>
+<hr />
+<h2 id="_11">常见学生问题解答</h2>
+<h3 id="_12">原理类问题</h3>
+<p><strong>Q1: 为什么射线方向需要归一化？</strong></p>
+<p>A: 归一化确保方向向量的长度为 1，这样参数 t 直接表示距离。如果不归一化，t 的含义会变化，影响碰撞检测的正确性。</p>
+<pre><code class="language-python"># 归一化
+direction = direction / np.linalg.norm(direction)
+</code></pre>
+<p><strong>Q2: Slab 方法中的 t_enter 和 t_exit 是什么？</strong></p>
+<p>A:
+- <code>t_enter</code>: 射线进入包围盒的参数值（最晚进入三个轴的时间）
+- <code>t_exit</code>: 射线离开包围盒的参数值（最早离开三个轴的时间）
+- 如果 <code>t_enter &lt;= t_exit</code>，说明三个轴的相交区间有重叠，即射线穿过包围盒</p>
+<p><strong>Q3: 为什么需要添加噪声？</strong></p>
+<p>A: 真实 LiDAR 存在测量误差：
+1. <strong>方向噪声</strong>：激光束发散、机械振动
+2. <strong>距离噪声</strong>：计时误差、大气折射</p>
+<p>不添加噪声的点云太"完美"，无法反映真实情况，也无法测试点云处理算法的鲁棒性。</p>
+<p><strong>Q4: DBSCAN 的 eps 参数如何选择？</strong></p>
+<p>A:
+- eps 太小：很多点被标记为噪声，聚类过于碎片化
+- eps 太大：不同物体被合并为一个聚类
+- 通常根据点云密度和场景尺度选择
+- 可以通过 k-距离图确定合适的 eps</p>
+<h3 id="_13">编程类问题</h3>
+<p><strong>Q5: 如何理解 <code>self.ray_dirs = self._generate_ray_dirs()</code>？</strong></p>
+<p>A: 这是预计算优化。射线方向只与 LiDAR 的 FOV 和分辨率有关，与位置无关。预计算后每次扫描直接使用，避免重复计算，提高性能。</p>
+<p><strong>Q6: <code>np.random.normal(0, 0.005, 3)</code> 是什么意思？</strong></p>
+<p>A: 生成 3 个服从正态分布的随机数：
+- 均值 = 0
+- 标准差 = 0.005
+- 数量 = 3（对应 x, y, z 三个分量）</p>
+<p><strong>Q7: 为什么 Open3D 版本更快？</strong></p>
+<p>A: 主要原因：
+1. <strong>GPU 加速</strong>：光线追踪在 GPU 上并行执行
+2. <strong>批量处理</strong>：一次处理所有射线，而不是循环
+3. <strong>优化数据结构</strong>：使用 Tensor 和 GPU 内存</p>
+<h3 id="_14">实操类问题</h3>
+<p><strong>Q8: 运行程序时窗口一闪而过？</strong></p>
+<p>A:
+- 确保在主线程调用 <code>plt.show()</code>
+- 检查是否有异常导致程序提前退出
+- 尝试在命令行运行查看错误信息</p>
+<p><strong>Q9: 点云聚类结果全是 -1？</strong></p>
+<p>A: 可能原因：
+1. eps 参数太小
+2. 点云数量太少
+3. 点云分布过于稀疏</p>
+<p>尝试增大 eps 或增加扫描分辨率。</p>
+<p><strong>Q10: 如何在代码中添加新的障碍物形状？</strong></p>
+<p>A: 参考 Box 类实现：</p>
+<pre><code class="language-python">class Cylinder:
+    def __init__(self, center, radius, height, color):
+        self.center = np.array(center)
+        self.radius = radius
+        self.height = height
+        self.color = color
+
+    def intersect(self, ray_origin, ray_dir):
+        # 圆柱相交检测（使用二次方程）
+        ...
+
+    def contains(self, point, margin=0.0):
+        # 检查点是否在圆柱内
+        ...
+
+    def get_mesh(self):
+        # 返回 Open3D 网格（用于可视化）
+        ...
+</code></pre>
+<hr />
+<h2 id="_15">评分标准建议</h2>
+<h3 id="40">平时成绩（40%）</h3>
+<table>
+<thead>
+<tr>
+<th>项目</th>
+<th>占比</th>
+<th>评分标准</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>出勤</td>
+<td>10%</td>
+<td>满勤 100 分，缺勤一次扣 10 分</td>
+</tr>
+<tr>
+<td>课堂参与</td>
+<td>10%</td>
+<td>积极提问和回答问题</td>
+</tr>
+<tr>
+<td>作业</td>
+<td>20%</td>
+<td>课后习题完成质量</td>
+</tr>
+</tbody>
+</table>
+<h3 id="30">实验成绩（30%）</h3>
+<table>
+<thead>
+<tr>
+<th>项目</th>
+<th>占比</th>
+<th>评分标准</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>实验操作</td>
+<td>10%</td>
+<td>独立完成实验操作</td>
+</tr>
+<tr>
+<td>数据记录</td>
+<td>10%</td>
+<td>数据完整、准确</td>
+</tr>
+<tr>
+<td>分析报告</td>
+<td>10%</td>
+<td>分析深入、结论正确</td>
+</tr>
+</tbody>
+</table>
+<h3 id="30_1">期末考核（30%）</h3>
+<table>
+<thead>
+<tr>
+<th>等级</th>
+<th>分数范围</th>
+<th>标准</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>优秀</td>
+<td>90-100</td>
+<td>全面掌握原理和代码，能独立扩展功能</td>
+</tr>
+<tr>
+<td>良好</td>
+<td>80-89</td>
+<td>掌握主要原理，能修改代码</td>
+</tr>
+<tr>
+<td>中等</td>
+<td>70-79</td>
+<td>基本掌握原理，能运行程序</td>
+</tr>
+<tr>
+<td>及格</td>
+<td>60-69</td>
+<td>部分掌握原理，能运行程序</td>
+</tr>
+<tr>
+<td>不及格</td>
+<td>&lt;60</td>
+<td>未能完成基本要求</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="_16">扩展资源</h2>
+<h3 id="_17">推荐视频</h3>
+<ol>
+<li><strong>射线追踪基础</strong></li>
+<li>YouTube: "Ray Tracing Essentials"</li>
+<li>
+<p>B站: "光线追踪入门教程"</p>
+</li>
+<li>
+<p><strong>点云处理</strong></p>
+</li>
+<li>Open3D 官方教程</li>
+<li>
+<p>YouTube: "Point Cloud Processing with Python"</p>
+</li>
+<li>
+<p><strong>聚类算法</strong></p>
+</li>
+<li>StatQuest: DBSCAN 解释</li>
+<li>scikit-learn 官方示例</li>
+</ol>
+<h3 id="_18">推荐阅读</h3>
+<ol>
+<li><strong>技术文档</strong></li>
+<li>Open3D 文档: http://www.open3d.org/</li>
+<li>
+<p>Matplotlib 3D 教程</p>
+</li>
+<li>
+<p><strong>学术论文</strong></p>
+</li>
+<li>"Efficient Sparse Voxel Octrees" - GPU 光线追踪</li>
+<li>
+<p>"DBSCAN Revisited" - 聚类算法</p>
+</li>
+<li>
+<p><strong>开源项目</strong></p>
+</li>
+<li>PyBullet（物理仿真）</li>
+<li>AirSim（无人机/汽车仿真）</li>
+</ol>
+<h3 id="_19">进阶学习路径</h3>
+<p>完成本课程后，学生可以继续学习：</p>
+<ol>
+<li><strong>点云处理</strong></li>
+<li>点云滤波（统计滤波、半径滤波）</li>
+<li>点云配准（ICP 算法）</li>
+<li>
+<p>点云分割</p>
+</li>
+<li>
+<p><strong>SLAM 技术</strong></p>
+</li>
+<li>LiDAR SLAM 基础</li>
+<li>Cartographer 算法</li>
+<li>
+<p>LOAM 系列算法</p>
+</li>
+<li>
+<p><strong>深度学习与点云</strong></p>
+</li>
+<li>PointNet</li>
+<li>PointPillars</li>
+<li>3D 目标检测</li>
+</ol>
+<hr />
+<h2 id="_20">教学反馈</h2>
+<h3 id="_21">课后评估</h3>
+<p>建议每次课后收集学生反馈：</p>
+<ol>
+<li>本节课最大的收获是什么？</li>
+<li>哪些内容还需要进一步讲解？</li>
+<li>实验难度是否合适？</li>
+<li>有什么改进建议？</li>
+</ol>
+<h3 id="_22">课程改进</h3>
+<p>根据学生反馈持续改进：
+- 调整理论和实践的比例
+- 增加更多实际应用案例
+- 优化实验内容设计
+- 更新技术方案</p>
+<hr />
+<h2 id="_23">附录：实验环境准备清单</h2>
+<h3 id="_24">软件要求</h3>
+<table>
+<thead>
+<tr>
+<th>软件</th>
+<th>版本</th>
+<th>安装命令</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Python</td>
+<td>3.8+</td>
+<td>conda 或官网下载</td>
+</tr>
+<tr>
+<td>NumPy</td>
+<td>1.21+</td>
+<td><code>pip install numpy</code></td>
+</tr>
+<tr>
+<td>Matplotlib</td>
+<td>3.5+</td>
+<td><code>pip install matplotlib</code></td>
+</tr>
+<tr>
+<td>scikit-learn</td>
+<td>1.0+</td>
+<td><code>pip install scikit-learn</code></td>
+</tr>
+<tr>
+<td>Open3D</td>
+<td>0.17+</td>
+<td><code>pip install open3d</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="_25">快速部署脚本</h3>
+<pre><code class="language-bash">#!/bin/bash
+# setup.sh
+
+# 创建虚拟环境
+python3 -m venv venv
+source venv/bin/activate
+
+# 安装基础依赖
+pip install --upgrade pip
+pip install numpy matplotlib scikit-learn
+
+# 可选：安装 Open3D
+# pip install open3d
+
+# 验证安装
+python3 -c &quot;
+import numpy
+import matplotlib
+try:
+    import sklearn
+    print('sklearn: OK')
+except:
+    print('sklearn: not installed')
+try:
+    import open3d
+    print('open3d: OK')
+except:
+    print('open3d: not installed')
+print('环境配置完成！')
+&quot;
+</code></pre>
+<hr />
+<p><em>本教师手册配套项目：LiDAR 点云仿真演示系统</em></p>
+<p><em>最后更新：2026年2月</em></p>
+</body>
+</html>
